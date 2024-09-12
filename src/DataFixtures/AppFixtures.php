@@ -3,6 +3,8 @@
 namespace App\DataFixtures;
 
 use App\Entity\Category;
+use App\Entity\Like;
+use App\Entity\Network;
 use App\Entity\Note;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -87,6 +89,27 @@ class AppFixtures extends Fixture
                 ;
                 $manager->persist($note);
             }
+        }
+        $manager->flush();
+
+        // 10 likes
+        for ($k = 0; $k < 10; $k++) {
+            $like = new Like();
+            $like
+                ->setNote($faker->randomElement($manager->getRepository(Note::class)->findAll()))
+                ->setCreator($faker->randomElement($manager->getRepository(User::class)->findAll()));
+            $manager->persist($like);
+        }
+        $manager->flush();
+
+        // 10 networks
+        for ($l = 0; $l < 10; $l++) {
+            $network = new Network();
+            $network
+                ->setName($faker->domainName)
+                ->setUrl($faker->url)
+                ->setCreator($faker->randomElement($manager->getRepository(User::class)->findAll()));
+            $manager->persist($network);
         }
         $manager->flush();
     }
