@@ -6,6 +6,7 @@ use App\Entity\Category;
 use App\Entity\Like;
 use App\Entity\Network;
 use App\Entity\Note;
+use App\Entity\Notification;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
@@ -60,7 +61,7 @@ class AppFixtures extends Fixture
             array_push($categoryArray, $category); // ajouter de l'objet
             $manager->persist($category);
         }
-        $manager->flush();
+
         // 10 utilisateurs
         for ($i = 0; $i < 10; $i++) {
             $username = $faker->userName;
@@ -72,44 +73,66 @@ class AppFixtures extends Fixture
                 ->setPassword(
                     $this->hash->hashPassword($user, 'admin') //2 parametres(user, mdp)
                 )
-                ->setRoles(['ROLE_USER']);
-
+                ->setRoles(['ROLE_USER'])
+                ->setImage($faker->imageUrl(640, 480))
+            ;
             $manager->persist($user);
-            // 10 notes
-            for ($j = 0; $j < 10; $j++) {
-                $note = new Note();
-                $note
-                    ->setTitle($faker->sentence())
-                    ->setSlug($this->slug->slug($note->getTitle()))
-                    ->setContent($faker->paragraphs(4, true))
-                    ->setPublic($faker->boolean(50))
-                    ->setViews($faker->numberBetween(100, 10000))
-                    ->setCreator($user)
-                    ->setCategory($faker->randomElement($categoryArray))
-                ;
-                $manager->persist($note);
-            }
         }
-        $manager->flush();
+
+
+        // 10 notes
+        for ($j = 0; $j < 10; $j++) {
+            $note = new Note();
+            $note
+                ->setTitle($faker->sentence())
+                ->setSlug($this->slug->slug($note->getTitle()))
+                ->setContent($faker->paragraphs(4, true))
+                ->setPublic($faker->boolean(50))
+                ->setViews($faker->numberBetween(100, 10000))
+                ->setCreator($user)
+                ->setCategory($faker->randomElement($categoryArray))
+            ;
+            $manager->persist($note);
+        }
+
+
+        // 10 notifications
+        for ($m = 0; $m < 10; $m++) {
+            $notification = new Notification();
+            $notification
+                ->setTitle($faker->sentence())
+                ->setContent($faker->paragraph(4, true))
+                ->setType($faker->bothify('?????-#####'))
+                ->isArchived($faker->boolean(50))
+            ;
+            $manager->persist($notification);
+        }
+
 
         // 10 likes
-        for ($k = 0; $k < 10; $k++) {
-            $like = new Like();
-            $like
-                ->setNote($faker->randomElement($manager->getRepository(Note::class)->findAll()))
-                ->setCreator($faker->randomElement($manager->getRepository(User::class)->findAll()));
-            $manager->persist($like);
-        }
-        $manager->flush();
+        $users = $manager->getRepository(User::class)->findAll();
+        $notes = $manager->getRepository(Note::class)->findAll();
 
-        // 10 networks
-        for ($l = 0; $l < 10; $l++) {
-            $network = new Network();
-            $network
-                ->setName($faker->domainName)
-                ->setUrl($faker->url)
-                ->setCreator($faker->randomElement($manager->getRepository(User::class)->findAll()));
-            $manager->persist($network);
+        if ((!empty($notes)) && (!empty($users))) {
+            for ($k = 0; $k < 10; $k++) {
+                $like = new Like();
+                $like
+                    ->setNote($faker->randomElement($notes))
+                    ->setCreator($faker->randomElement($users));
+                $manager->persist($like);
+            }
+        }
+
+        if (!empty($users)) {
+            // 10 networks
+            for ($l = 0; $l < 10; $l++) {
+                $network = new Network();
+                $network
+                    ->setName($faker->domainName())
+                    ->setUrl($faker->url())
+                    ->setCreator($faker->randomElement($users));
+                $manager->persist($network);
+            }
         }
         $manager->flush();
     }
