@@ -6,10 +6,12 @@ use App\Entity\Note;
 use App\Form\NoteType;
 use App\Repository\NoteRepository;
 use App\Repository\UserRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 #[Route('/notes')] //sufixe pour les route controller
 
@@ -49,17 +51,26 @@ class NoteController extends AbstractController
     }
 
     #[Route('/new', name: 'app_note_new', methods: ['GET', 'POST'])]
-    public function new(Request $request): Response
+    public function new(Request $request, EntityManagerInterface $em, SluggerInterface $slugger): Response
     {
-        $note = new Note(); // Création d'une nouvelle note
-        $form = $this->createForm(NoteType::class, $note); // Chargement du formulaire
-        $form = $form->handleRequest($request); //recuperation des données de la request POST
+        $form = $this->createForm(NoteType::class); // Chargement du formulaire
+        $form = $form->handleRequest($request); // Recuperation des données de la requête POST
 
-        dd($form->getData()); // Dump and die pour voir les données
+        // Traitement des données
+        if ($form->isSubmitted() && $form->isValid()) {
+            $note = new Note();
+            $note
+                ->setTitle($form->get('title')->getData())
+                ->setSlug($slugger->slug($note->getTitle()))
+                ->setContent($form->get('content')->getData())
+                ->setPublic($form->get('is_public')->getData())
+                ->setCategory($form->get('category')->getData())
+                ->setCreator($form->get('creator')->getData())
+            ;
+            $em->persist($note);
+            $em->flush();
 
-        //Traitement des données
-        if($form->isSubmitted() && $form->isValid()) {
-            // tu enregistres la note en bdd
+            dd($note); // Dump and die pour voir les données
         }
         return $this->render('note/new.html.twig', [
             'noteForm' => $form
