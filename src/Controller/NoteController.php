@@ -70,7 +70,8 @@ class NoteController extends AbstractController
             $em->persist($note);
             $em->flush();
 
-            dd($note); // Dump and die pour voir les données
+            $this->addFlash('success', 'Your note has been created');
+            return $this->redirectToRoute('app_note_show', ['slug' => $note->getSlug()]);
         }
         return $this->render('note/new.html.twig', [
             'noteForm' => $form
