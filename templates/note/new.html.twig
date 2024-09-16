@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	Add a new note
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+
+{% endblock %}
+
+{% block body %}
+
+	{{ form(noteForm) }}
+    
+{% endblock %}

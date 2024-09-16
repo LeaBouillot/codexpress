@@ -64,7 +64,6 @@ class Note
         $this->notifications = new ArrayCollection();
         $this->is_public = false; // Initialisation du booléan à false
         $this->title = uniqid('note_'); // Initialisation du titre au GUID
-        $this->likes = new ArrayCollection();
     }
 
     #[ORM\PrePersist]

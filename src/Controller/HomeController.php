@@ -19,7 +19,8 @@ class HomeController extends AbstractController
             6 // limite à 6 jours
         );
         return $this->render('home/index.html.twig', [
-            'lastNotes' => $lastNotes
+            'lastNotes' => $lastNotes, // Envois des notes à la vue Twig
+            'totalNotes' => count($nr->findAll()) //Renvois le compte totale de notes
         ]);
     }
 }

@@ -2,9 +2,12 @@
 
 namespace App\Controller;
 
+use App\Entity\Note;
+use App\Form\NoteType;
 use App\Repository\NoteRepository;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -24,7 +27,7 @@ class NoteController extends AbstractController
         ]);
     }
 
-    #[Route('/{slug}', name: 'app_note_show', methods: ['GET'])]
+    #[Route('/u/{slug}', name: 'app_note_show', methods: ['GET'])]
     public function show(string $slug, NoteRepository $nr): Response
     {
         $note = $nr->findOneBySlug(['slug' => $slug]);
@@ -33,7 +36,7 @@ class NoteController extends AbstractController
         ]);
     }
 
-    #[Route('/{username}', name: 'app_note_user', methods: ['GET'])]
+    #[Route('/u/{username}', name: 'app_note_user', methods: ['GET'])]
     public function userNotes(
         string $username,
         UserRepository $user, // Cette fois on utilise le repository User
@@ -46,9 +49,21 @@ class NoteController extends AbstractController
     }
 
     #[Route('/new', name: 'app_note_new', methods: ['GET', 'POST'])]
-    public function new(): Response
+    public function new(Request $request): Response
     {
-        return $this->render('note/new.html.twig', []);
+        $note = new Note(); // Création d'une nouvelle note
+        $form = $this->createForm(NoteType::class, $note); // Chargement du formulaire
+        $form = $form->handleRequest($request); //recuperation des données de la request POST
+
+        dd($form->getData()); // Dump and die pour voir les données
+
+        //Traitement des données
+        if($form->isSubmitted() && $form->isValid()) {
+            // tu enregistres la note en bdd
+        }
+        return $this->render('note/new.html.twig', [
+            'noteForm' => $form
+        ]);
     }
 
     #[Route('/edit{slug}', name: 'app_note_edit', methods: ['GET', 'POST'])]
