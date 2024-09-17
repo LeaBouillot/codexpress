@@ -11,6 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
 #[Route('/notes')] //sufixe pour les route controller
@@ -49,10 +50,15 @@ class NoteController extends AbstractController
             'userNote' => $creator->getNotes(), // Récupère les notes de l'utilisateur
         ]);
     }
-
+    // #[IsGranted('IS_AUTHENTICATED_FULLY')] //redirection à la page 
     #[Route('/new', name: 'app_note_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $em, SluggerInterface $slugger): Response
     {
+        if (!$this->getUser()) { //si utilisateur n'est pas conecté
+            $this->addFlash('error', 'You must be logged in to create a note.');
+            return $this->redirectToRoute('app_login'); // redirection à la page login si l'utilisateur n'est pas connecté.
+        }
+
         $form = $this->createForm(NoteType::class); // Chargement du formulaire
         $form = $form->handleRequest($request); // Recuperation des données de la requête POST
 
@@ -78,14 +84,35 @@ class NoteController extends AbstractController
         ]);
     }
 
-    #[Route('/edit{slug}', name: 'app_note_edit', methods: ['GET', 'POST'])]
-    public function edit(string $slug, NoteRepository $nr): Response
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[Route('/edit/{slug}', name: 'app_note_edit', methods: ['GET', 'POST'])]
+    public function edit(
+        string $slug, 
+        NoteRepository $nr,
+        Request $request,
+        EntityManagerInterface $em,
+        ): Response
     {
-        $note = $nr->findOneBySlug($slug); // recuperer la note via le
+        $note = $nr->findOneBySlug($slug); // recuperer la note à modifier
+
+        if ($note->getCreator() !== $this->getUser()){ 
+            $this->addFlash('error', 'You authorized to edit a note.');
+        return $this->redirectToRoute('app_note_show', ['slug' =>$slug]);
+    }
+
+        $form = $this->createForm(NoteType::class, $note); // Chargement du formulaire avaec des données de la note
+        $form = $form->handleRequest($request); // Recuperation des données de la requête POST
+        
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em->persist($note);
+            $em->flush();
+
+            $this->addFlash('success', 'Your note has been created');
+            return $this->redirectToRoute('app_note_show', ['slug' => $note->getSlug()]);
+        }
+    
         // TODO: Formulaire de modification et traitement des donées
-        return $this->render('note/edit.html.twig', [
-            'note' => $note, // Envoie les données de la note à la vue Twig
-        ]);
+        return $this->render('note/edit.html.twig', ['noteForm' => $form]);
     }
 
     #[Route('/delete{slug}', name: 'app_note_delete', methods: ['POST'])]

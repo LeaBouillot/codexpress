@@ -9,7 +9,12 @@
 {% endblock %}
 
 {% block body %}
+ {# {% if app.user is defined %}
+ {# rediriger si acces refusé #}
+ {# {{ include('components/access-denied.html.twig') }}  #}
+ {# access denied
+ {% else %} #}
 
 	{{ form(noteForm) }}
-    
+  {# {% endif %}    #}
 {% endblock %}
