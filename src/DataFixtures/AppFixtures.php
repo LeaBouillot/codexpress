@@ -101,7 +101,7 @@ class AppFixtures extends Fixture
             $notification = new Notification();
             $notification
                 ->setTitle($faker->sentence())
-                ->setContent($faker->paragraph(4, true))
+                ->setContent($faker->randomHtml()) //->setContent($faker->paragraph(4, true))
                 ->setType($faker->bothify('?????-#####'))
                 ->isArchived($faker->boolean(50))
             ;

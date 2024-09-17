@@ -38,7 +38,7 @@ security:
         # - { path: ^/register, roles: RPUBLIC_ACCESS }
         # - { path: ^/, roles: ROLE_ADMIN }
         # - { path: ^/notes/new, roles: ROLE_USER }
-        # - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
 
 when@test:

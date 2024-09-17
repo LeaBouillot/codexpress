@@ -4,5 +4,6 @@
 
 {% block body %}
 <h1> User profile</h1>
+<img src="{{ app.user.image }}" alt="{{ 'profile image of' ~ app.user.username }}" class= "w-16 rounded-full md-4">
 {{ dump(app.user) }}
 {% endblock %}

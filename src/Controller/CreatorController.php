@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -9,13 +10,14 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 
 #[IsGranted(('AUTHENTICATION_FULLY'))]
-#[Route('/profile')]
+
 // Acces permis uniqument aux utilisateurs authentifiés 
 class CreatorController extends AbstractController
 {
     #[Route('/profile', name: 'app_profile', methods: ['GET'])]
-    public function profile(): Response
+    public function profile(Request $request, EntityManagerInterface $em): Response
     {
+        // $form=$this->createForm($);
         return $this->render('creator/profile.html.twig', []);
     }
 
