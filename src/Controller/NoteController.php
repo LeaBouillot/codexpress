@@ -30,10 +30,12 @@ class NoteController extends AbstractController
         ]);
     }
 
-    #[Route('/u/{slug}', name: 'app_note_show', methods: ['GET'])]
+    #[Route('/n/{slug}', name: 'app_note_show', methods: ['GET'])]
     public function show(string $slug, NoteRepository $nr): Response
     {
-        $note = $nr->findOneBySlug(['slug' => $slug]);
+        $note = $nr->findOneBySlug(['slug' => $slug]); // Objet Note
+        // $creatorNotes= array_slice($note->getCreator()->getNotes(), 0, 3);
+
         return $this->render('note/show.html.twig', [
             'note' => $note,
         ]);
