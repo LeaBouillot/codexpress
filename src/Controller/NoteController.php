@@ -7,6 +7,7 @@ use App\Form\NoteType;
 use App\Repository\NoteRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,14 +20,18 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 class NoteController extends AbstractController
 {
     #[Route('/', name: 'app_note_all', methods: ['GET'])]
-    public function all(NoteRepository $nr): Response
+    public function all(NoteRepository $nr, Request $request, PaginatorInterface $paginator): Response
     {
-        $notes = $nr->findAll(
-            ['is_public' => true], //Filtre bles notes publiques
-            ['created_at' => 'DESC']
+        $pagination = $paginator->paginate(
+            $nr->FindBy(
+                ['is_public' => true], //Filtre bles notes publiques
+                ['created_at' => 'DESC']
+            ),
+            $request->query->getInt('page', 1), /*page number*/
+            10 /*limit per page*/
         );
         return $this->render('note/all.html.twig', [
-            'allNotes' => $notes,
+            'allNotes' => $pagination,
         ]);
     }
 
@@ -89,22 +94,21 @@ class NoteController extends AbstractController
     #[IsGranted('IS_AUTHENTICATED_FULLY')]
     #[Route('/edit/{slug}', name: 'app_note_edit', methods: ['GET', 'POST'])]
     public function edit(
-        string $slug, 
+        string $slug,
         NoteRepository $nr,
         Request $request,
         EntityManagerInterface $em,
-        ): Response
-    {
+    ): Response {
         $note = $nr->findOneBySlug($slug); // recuperer la note à modifier
 
-        if ($note->getCreator() !== $this->getUser()){ 
+        if ($note->getCreator() !== $this->getUser()) {
             $this->addFlash('error', 'You authorized to edit a note.');
-        return $this->redirectToRoute('app_note_show', ['slug' =>$slug]);
-    }
+            return $this->redirectToRoute('app_note_show', ['slug' => $slug]);
+        }
 
         $form = $this->createForm(NoteType::class, $note); // Chargement du formulaire avaec des données de la note
         $form = $form->handleRequest($request); // Recuperation des données de la requête POST
-        
+
         if ($form->isSubmitted() && $form->isValid()) {
             $em->persist($note);
             $em->flush();
@@ -112,7 +116,7 @@ class NoteController extends AbstractController
             $this->addFlash('success', 'Your note has been created');
             return $this->redirectToRoute('app_note_show', ['slug' => $note->getSlug()]);
         }
-    
+
         // TODO: Formulaire de modification et traitement des donées
         return $this->render('note/edit.html.twig', ['noteForm' => $form]);
     }
