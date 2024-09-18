@@ -44,6 +44,7 @@ class AppFixtures extends Fixture
             'bash' => 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/bash/bash-plain.svg',
             'Markdown' => 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/markdown/markdown-original.svg',
             'Java' => 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/java/java-original-wordmark.svg',
+            
         ];
 
         $categoryArray = []; // Ce tableau nous servira pour conserver les objets Category
