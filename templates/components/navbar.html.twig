@@ -1,33 +1,17 @@
-<nav class="flex items-center justify-between p-2 bg-neutral-50">
-	<a href="{{ path('app_home')}}" class="flex items-center gap-1">
-		<img src="{{ asset('/img/logo_dark.svg')}}" alt="logo" width="32" class="transition-transform duration-200 ease-in-out rounded-full hover:scale-95">
-		<p>Codexpress</p>
+<nav class="flex items-center justify-between p-2 bg-slate-50">
+	<a href="{{path('app_home')}}" class="flex items-center gap-1">
+		<img src="{{ asset('img/logo_dark.svg')}}" alt="logo" width="32" class="transition-transform duration-200 ease-in-out rounded-full hover:scale-95">
+		<p>CodeXpress</p>
 	</a>
-	{# partie à gauche (logo) #}
-	<div
-		class="flex items-center justify-between gap-4">
-		{# partie à droite #}
-		<form action="{{ path('app_search')}}" method="post" class="items-center hidden p-1 rounded-md bg-slate-100 md:flex">
-			<input type="hidden" name="csrf_token" value="{{ csrf_token('authenticate') }}">
-			<input type="text" name="q" id="" value="" placeholder="Looking for a specific note?" class="">
-			<button type="submit">{{ ux_icon('mdi:search', { 'class': 'h-6 w-6 text-neutral-600 hover:text-violet-600'}) }}</button>
-		</form>
-
+	<div class="flex items-center justify-between gap-4">
+		{{ include('components/_partials/search.html.twig') }}
 		{% if app.user %}
-
 			<div class="flex items-center justify-between gap-4">
-				<a href="#" class="p-2 rounded-md md:hidden bg-slate-200">{{ ux_icon('mdi:search', { 'class': 'h-6 w-6 text-neutral-600 hover:text-violet-600'}) }}</a>
 
-				<a href="{{ path('app_note_new')}}" class="p-2 rounded-md bg-slate-200">{{ ux_icon('mdi:plus-box-outline', { 'class': 'h-6 w-6 text-neutral-600 hover:text-violet-600'}) }}</a>
+				{{ include('components/_partials/navbar_login.html.twig') }}
 
-				<a href="{{ path('app_profile_edit')}}" class="p-2 rounded-md bg-slate-200">
-					{{ ux_icon('mdi:cog-outline', { 'class': 'h-6 w-6 text-neutral-600 hover:text-violet-600'}) }}</a>
-
-				<a href="{{ path('app_note_user', {'username': app.user.username ?? 'martin'})}}" class="transition-transform duration-200 ease-in-out rounded-full shadow-md hover:scale-95">
-					<img src="https://avatar.iran.liara.run/public/22" alt="logo" width="48" class="rounded-full">
-				</a>
 			{% else %}
-				<a href="{{ path('app_login')}}" class="p-2 rounded-md bg-slate-200">{{ ux_icon('mdi:account-outline', { 'class': 'h-6 w-6 text-neutral-600 hover:text-violet-600'}) }}</a>
+				{{ include('components/_partials/navbar_logout.html.twig') }}
 			{% endif %}
 		</div>
 	</div>

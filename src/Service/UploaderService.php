@@ -3,14 +3,8 @@
 namespace App\Service;
 
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-/**
- * Service de televercement de fichier dans l'application Codexpress
- * - images (.jpg, .jpeg, .png, .gif)
- * Document (plus tards)
- * 
- * Méthodes : Televerser, Supprimer
- */
 class UploaderService
 {
     private $param;
@@ -20,22 +14,27 @@ class UploaderService
         $this->param = $parameterBag;
     }
 
-   public function uploadImage($file): string
-   {
-       try {
-           // $orignalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-           $fileName = uniqid('image-') . '.' . $file->guessExtension();
-           $file->move($this->param->get('uploads_images_directory'), $fileName);
-           $res=[
-            'message' =>'Image uploaded successfully',
-            'file_name' => $fileName,
-           ];
+    public function uploadImage(UploadedFile $file): string
+    {
+        try {
+            $fileName = uniqid('image-') . '.' . $file->guessExtension();
+            $file->move($this->param->get('uploads_images_directory'), $fileName);
 
-           return $this->param->get('uploads_images_directory') . '/' . $fileName;
-       } catch (\Exception $e) {
-           throw new \Exception('An error occured while uploading the image: ' . $e->getMessage());
-       }
-   }
+            return $fileName;
+        } catch (\Exception $e) {
+            throw new \Exception('An error occurred while uploading the image: ' . $e->getMessage());
+        }
+    }
 
-//...
+    public function deleteImage(string $fileName): void
+    {
+        try {
+            $filePath = $this->param->get('uploads_images_directory') . '/' . $fileName;
+            if (file_exists($filePath)) {
+                unlink($filePath); //supprimer
+            }
+        } catch (\Exception $e) {
+            throw new \Exception('An error occurred while deleting the image: ' . $e->getMessage());
+        }
+    }
 }

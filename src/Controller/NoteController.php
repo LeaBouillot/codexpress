@@ -43,6 +43,7 @@ class NoteController extends AbstractController
 
         return $this->render('note/show.html.twig', [
             'note' => $note,
+            'creatorNotes' => $nr->findByCreator($note->getCreator()->getId()),
         ]);
     }
 

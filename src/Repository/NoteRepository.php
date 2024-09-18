@@ -22,25 +22,28 @@ class NoteRepository extends ServiceEntityRepository
      * @param string $query
      * @return array Returns an array of Note objects
      */
-    public function findByQuery($query): array
+    public function findByQuery($query): array //Search
     {
-        return $this->createQueryBuilder('n') //nomer premiere lettre n
+        return $this->createQueryBuilder('n') //method (nomer premiere lettre n)
             ->where('n.is_public = true') // 
             ->andWhere('n.title LIKE :q OR n.content LIKE :q') //
-            ->setParameter('q', '%'. $query . '%')
+            ->setParameter('q', '%' . $query . '%')
             ->orderBy('n.created_at', 'DESC')
             ->getQuery() // form associative array
             ->getResult()
         ;
     }
 
-    //    public function findOneBySomeField($value): ?Note
-    //    {
-    //        return $this->createQueryBuilder('n')
-    //            ->andWhere('n.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    public function findByCreator($id): array //modofier à NoteController 45/
+    {
+        return $this->createQueryBuilder('n')
+            ->where('n.is_public = true')
+            ->andWhere('n.creator = :id') //dans le bdd champ name
+            ->setParameter('id', $id)
+            ->orderBy('n.created_at', 'DESC')
+            ->setMaxResults(3) //limitation à 3 resultat
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 }
