@@ -1,16 +1,15 @@
-<a href="{{ path('app_search')}}" class="p-2 rounded-md bg-slate-200">{{ ux_icon('mdi:search', { 'class': 'h-6 w-6 text-neutral-600 hover:text-violet-600'}) }}</a>
+{#  Template when the user is logged in #}
 
-
-<a href="{{ path('app_note_all')}}" data-tooltip="All notes" class="p-2 rounded-md bg-slate-200">{{ ux_icon('mdi:archive-outline', { 'class': 'h-6 w-6 text-neutral-600 hover:text-violet-600'}) }}</a>
-
-<a href="{{ path('app_note_new')}}" class="p-2 rounded-md bg-slate-200">{{ ux_icon('mdi:plus-box-outline', { 'class': 'h-6 w-6 text-neutral-600 hover:text-violet-600'}) }}</a>
-
-<a href="{{ path('app_profile_edit')}}" class="p-2 rounded-md bg-slate-200">
-	{{ ux_icon('mdi:cog-outline', { 'class': 'h-6 w-6 text-neutral-600 hover:text-violet-600'}) }}</a>
-
-<a href="{{ path('app_note_user', {'username': app.user.username ?? 'martin'})}}" class="transition-transform duration-200 ease-in-out rounded-full shadow-md hover:scale-95"></a>
-<a href="{{path('app_profile')}}" class="p-2 rounded-full" title="Your Notes">
-	<img src="images/uploads/{{app.user.image ?? 'https://avatar.iran.liara.run/public/30' }}" alt="logo" width="32" class="">
-
+<a href="{{ path('app_search') }}" data-tooltip="Search notes" class="p-2 rounded-md bg-slate-200 md:hidden tooltip">
+	{{ ux_icon('mdi:search', { 'class': 'h-6 w-6 text-neutral-600 hover:text-violet-600' }) }}
 </a>
-
+<a href="{{ path('app_note_all')}}" data-tooltip="All notes" class="p-2 rounded-md bg-slate-200 tooltip">
+	{{ ux_icon('mdi:archive-outline', { 'class': 'h-6 w-6 text-neutral-600 hover:text-violet-600' }) }}
+</a>
+<a href="{{ path('app_note_new')}}" data-tooltip="Add a new note" class="p-2 rounded-md bg-slate-200 tooltip">
+	{{ ux_icon('mdi:plus-box-outline', { 'class': 'h-6 w-6 text-neutral-600 hover:text-violet-600' }) }}
+</a>
+<a href="{{ path('app_profile_edit')}}" data-tooltip="Edit your profile" class="p-2 rounded-md bg-slate-200 tooltip">
+	{{ ux_icon('mdi:cog-outline', { 'class': 'h-6 w-6 text-neutral-600 hover:text-violet-600' }) }}
+</a>
+<a href="{{ path('app_note_user', { 'username': app.user.username })}}" class="transition-transform duration-200 ease-in-out bg-center bg-cover rounded-full shadow-md w-11 h-11 hover:scale-95" style="background-image: url('{{ '/images/uploads/' ~ app.user.image ?? 'default.png' }}')"></a>

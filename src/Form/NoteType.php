@@ -8,6 +8,7 @@ use App\Entity\User;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\CountryType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -20,43 +21,38 @@ class NoteType extends AbstractType
     {
         $builder
             ->add('title', TextType::class, [
-                'row_attr' => ['class' => 'flex flex-col gap_1'],
+                'row_attr' => ['class' => 'flex flex-col gap-1'],
                 'label' => 'Choose a title',
-                'label_attr' => ['class' => 'text-violet-950 front-semibold'],
-                'attr' => ['class' => 'border-violet-950 rounded-md p-2 w-full focus:border-violet-600'],
-                'help' => 'This id title or your note',
-                'help_attr' => ['class' => 'text-sm text-violet-600']
+                'label_attr' => ['class' => 'text-violet-950 font-semibold w-full'],
+                'attr' => [
+                    'class' => 'border-2 border-violet-950 rounded-md p-2 w-full focus:border-violet-600',
+                ],
+                'help' => 'This is the title of your note',
+                'help_attr' => ['class' => 'text-sm text-violet-600'],
             ])
             ->add('content', TextareaType::class, [
-                'row_attr' => ['class' => 'flex flex-col gap_1'],
+                'row_attr' => ['class' => 'flex flex-col gap-1'],
                 'label' => 'Write your code',
-                'label_attr' => ['class' => 'text-violet-950 front-semibold'],
-                'attr' => ['class' => 'border-violet-950 rounded-md p-2 w-full focus:border-violet-600'],
-                'help' => 'What do you want to share on Codexpress?',
-                'help_attr' => ['class' => 'text-sm text-violet-600']
+                'label_attr' => ['class' => 'text-violet-950 font-semibold w-full'],
+                'attr' => [
+                    'class' => 'border-2 border-violet-950 rounded-md p-2 w-full focus:border-violet-600',
+                ],
+                'help' => 'What do you want to share on CodeXpress?',
+                'help_attr' => ['class' => 'text-sm text-violet-600'],
             ])
-            ->add('is_public', CheckboxType::class, ['mapped' => false])
+            ->add('is_public', CheckboxType::class, [
+                'mapped' => false,
+                'required' => false,
+            ])
             ->add('category', EntityType::class, [
                 'class' => Category::class,
-                'choice_label' => 'id',
+                'choice_label' => 'title',
             ])
             ->add('creator', EntityType::class, [
                 'class' => User::class,
-                'choice_label' => 'id',
+                'choice_label' => 'username',
             ])
             ->add('submit', SubmitType::class)
-            // à SUPPRIMER: ce qu on n'a pas besoin
-            // ->add('slug')
-            //->add('views')
-            //  ->add('created_at', null, [
-            //     'widget' => 'single_text',
-            // ])
-            // ->add('updated_at', null, [
-            //     'widget' => 'single_text',
-            // ])
-
-            // ->add('title', TextType::class, [ ]
-            // (nom property, type, [tableau associatif option ])
         ;
     }
 

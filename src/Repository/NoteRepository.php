@@ -17,10 +17,10 @@ class NoteRepository extends ServiceEntityRepository
     }
 
     /**
-     * findByQuery
-     * Méthode pour la recherch de note dans l'appli Codexpress
+     * finByQuery
+     * Méthode pour la recherche de note dans l'application CodeXpress
      * @param string $query
-     * @return array Returns an array of Note objects
+     * @return array
      */
     public function findByQuery($query): array //Search
     {

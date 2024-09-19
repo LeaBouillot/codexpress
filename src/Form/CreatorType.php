@@ -10,7 +10,6 @@ use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 
 class CreatorType extends AbstractType
 {
@@ -19,17 +18,14 @@ class CreatorType extends AbstractType
         $builder
             ->add('email', EmailType::class)
             ->add('image', DropzoneType::class, [
-                'attr' => ['placeholder' => 'Drag and drop photo here'],
                 'mapped' => false,
+                'required' => false,
                 'constraints' => [
                     new File([
-                        'maxSize' => '5000k',
-                        'mimeTypes' => [
-                            'image/jpeg',
-                            'image/png',
-                            'image/gif',
-                        ],
-                    ]),
+                        'maxSize' => '1024k',
+                        'mimeTypes' => ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
+                        'mimeTypesMessage' => 'Please upload a valid image file',
+                    ])
                 ],
             ])
             ->add('submit', SubmitType::class)
