@@ -9,7 +9,9 @@ use App\Entity\Network;
 use App\Entity\Category;
 use App\Entity\Like;
 use App\Entity\Notification;
+use App\Entity\Offer;
 use App\Entity\Subscription;
+use App\Entity\View;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Symfony\Component\String\Slugger\SluggerInterface;
@@ -97,7 +99,7 @@ class AppFixtures extends Fixture
                 $manager->persist($network);
             }
             $manager->persist($user);
-            
+
             // 10 Notes
             for ($j = 0; $j < 10; $j++) {
                 $note = new Note();
@@ -109,41 +111,91 @@ class AppFixtures extends Fixture
                     ->setViews($faker->numberBetween(100, 10000))
                     ->setCreator($user)
                     ->setCategory($faker->randomElement($categoryArray))
-                    // ->addLike($faker->numberBetween(10, 1000))
-                    // ->addNotification($faker->randomElement($notificationsArray))
                 ;
                 $manager->persist($note);
             }
-            // Like
-            for ($k = 0; $k < 5; $k++) {
-                $like = new Like();
-                $like
-                    ->setCreator($user)
-                    ->setNote($faker->randomElement($manager->getRepository(Note::class)->findAll()))
-                ;
-                $manager->persist($like);
+
+            // Notifications
+            $notificationsArray = [];
+            // Récupère tous les notifications existantes pour les lier aux notes
+            $notifications = $manager->getRepository(Notification::class)->findAll();
+            foreach ($notifications as $notification) {
+                // Ajoute 10 notifications à chaque note
+                for ($o = 0; $o < 10; $o++) {
+                    $notification->addNote($faker->randomElement($manager->getRepository(Note::class)->findAll()));
+                }
+                array_push($notificationsArray, $notification);
+                $manager->persist($notification);
             }
-            // 10 Subscriptions
-            for ($m = 0; $m < 5; $m++) {
+
+            // Offers
+            $offers = [];
+
+            $offer1 = new Offer();
+            $offer1
+                ->setName('Standard')
+                ->setPrice(0.00)
+                ->setFeatures('Basic access to features');
+            $manager->persist($offer1);
+            $offers[] = $offer1;
+
+            $offer2 = new Offer();
+            $offer2
+                ->setName('Premium')
+                ->setPrice(9.99)
+                ->setFeatures('Premium access, additional features included');
+            $manager->persist($offer2);
+            $offers[] = $offer2;
+
+            $offer3 = new Offer();
+            $offer3
+                ->setName('Business')
+                ->setPrice(29.99)
+                ->setFeatures('Full access, priority support, and business features');
+            $manager->persist($offer3);
+            $offers[] = $offer3;
+
+            // Subscriptions
+            for ($i = 0; $i < 5; $i++) {
                 $subscription = new Subscription();
                 $subscription
+                    ->setOffer($offers[array_rand($offers)])
                     ->setCreator($user)
-                    ->setOffer($faker->randomElement($manager->getRepository(Offer::class)->findAll()))
-                ;
+                    ->setStartDate($faker->dateTime)
+                    ->setEndDate($faker->dateTimeImmutableBetween('+1 month', '+2 years'));
+
                 $manager->persist($subscription);
             }
+
+            $manager->flush();
+
+            //Like 
+            for ($k = 0; $k < 30; $k++) {
+                $like = new Like();
+
+                // Choisir un utilisateur aléatoire et une note aléatoire
+                $randomUser = $user[array_rand($user)];
+                $randomNote = $note[array_rand($note)]; // $notes contient toutes les entités Note persistées
+
+                $like->setCreator($randomUser) // Associe l'utilisateur à ce like
+                    ->setNote($randomNote); // Associe la note à ce like
+
+                $manager->persist($like);
+            }
+
+            // View
+            for ($l = 0; $l < 1000; $l++) {
+                $view = new View();
+
+                // Choisir une note aléatoire pour la vue
+                $randomNote = $note[array_rand($note)];
+
+                $view->setNote($randomNote) // Associe la vue à une note
+                    ->setIpAddress($faker->ipv4); // Génère une adresse IP aléatoire
+
+                $manager->persist($view);
+            }
+            $manager->flush();
         }
-        //10 Notifications
-        for ($l = 0; $l < 10; $l++) {
-            $notification = new Notification();
-            $notification
-                ->setTitle($faker->sentence())
-                ->setContent($faker->randomHtml())
-                ->setType($faker->sentence())
-                ->isArchived($faker->boolean(50))
-            ;
-            $manager->persist($notification);
-        }
-        $manager->flush();
     }
 }
