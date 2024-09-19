@@ -1,18 +1,53 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-	Add a new note
+	Ajouter une nouvelle note
 {% endblock %}
 
 {% block body %}
-{% if app.user %}
-    {# {{ include('components/access-denied.html.twig') }} #}
-    {% if app.user.email|length > 18 %}
-        {{ form(noteForm) }}
-    {% endif %}
-{% else %}
-    {# {{ include('components/access-denied.html.twig') }} #}
-    <!-- JE SUIS LÀ -->
-    Access denied
-{% endif %}
-{% endblock %}
+	<div class="container px-4 py-8 mx-auto">
+		{% if app.user %}
+			{% if app.user.email|length > 18 %}
+				<div class="max-w-2xl p-8 mx-auto bg-white rounded-lg shadow-md">
+					<h1 class="mb-6 text-2xl font-bold">Ajouter une Nouvelle Note</h1>
+
+					{{ form_start(noteForm, {'attr': {'class': 'space-y-4'}}) }}
+
+					<div class="mb-4">
+						{{ form_label(noteForm.title, 'Titre', {'label_attr': {'class': 'block text-gray-700 text-sm font-bold mb-2'}}) }}
+						{{ form_widget(noteForm.title, {'attr': {'class': 'shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
+						{{ form_errors(noteForm.title) }}
+					</div>
+
+					<div class="mb-4">
+						{{ form_label(noteForm.content, 'Contenu', {'label_attr': {'class': 'block text-gray-700 text-sm font-bold mb-2'}}) }}
+						{{ form_widget(noteForm.content, {'attr': {'class': 'shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline', 'rows': 5}}) }}
+						{{ form_errors(noteForm.content) }}
+					</div>
+
+					<div class="mb-4">
+						{{ form_label(noteForm.category, 'Catégorie', {'label_attr': {'class': 'block text-gray-700 text-sm font-bold mb-2'}}) }}
+						{{ form_widget(noteForm.category, {'attr': {'class': 'shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
+						{{ form_errors(noteForm.category) }}
+					</div>
+
+					<div class="flex items-center justify-between">
+						<button type="submit" class="px-4 py-2 font-bold text-white bg-blue-500 rounded hover:bg-blue-700 focus:outline-none focus:shadow-outline">
+							Enregistrer
+						</button>
+						<a href="{{ path('app_note_all') }}" class="text-sm text-blue-500 hover:text-blue-700">Annuler</a>
+					</div>
+
+					{{ form_end(noteForm) }}
+				</div>
+			{% else %}
+				<div class="py-8 text-center">
+					<p class="font-bold text-red-500">Accès refusé : Votre adresse e-mail est trop courte pour créer une note.</p>
+				</div>
+			{% endif %}
+		{% else %}
+			<div class="py-8 text-center">
+				<p class="font-bold text-red-500">Accès refusé : Vous devez être connecté pour ajouter une note.</p>
+			</div>
+		{% endif %}
+	{% endblock %}
