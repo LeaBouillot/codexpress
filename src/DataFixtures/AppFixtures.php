@@ -7,6 +7,9 @@ use App\Entity\Note;
 use App\Entity\User;
 use App\Entity\Network;
 use App\Entity\Category;
+use App\Entity\Like;
+use App\Entity\Notification;
+use App\Entity\Subscription;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Symfony\Component\String\Slugger\SluggerInterface;
@@ -59,7 +62,7 @@ class AppFixtures extends Fixture
             array_push($categoryArray, $category); // Ajout de l'objet
             $manager->persist($category);
         }
-        // Admin
+        // ROLE_ADMIN
         $user =  new User();
         $user
             ->setEmail('hello@codexpress.fr')
@@ -83,6 +86,7 @@ class AppFixtures extends Fixture
                 ->setRoles(['ROLE_USER'])
                 ->setImage('https://avatar.iran.liara.run/public/' . $i)
             ;
+            // Network
             for ($z = 0; $z < 3; $z++) {
                 $network = new Network();
                 $network
@@ -93,7 +97,8 @@ class AppFixtures extends Fixture
                 $manager->persist($network);
             }
             $manager->persist($user);
-
+            
+            // 10 Notes
             for ($j = 0; $j < 10; $j++) {
                 $note = new Note();
                 $note
@@ -104,11 +109,41 @@ class AppFixtures extends Fixture
                     ->setViews($faker->numberBetween(100, 10000))
                     ->setCreator($user)
                     ->setCategory($faker->randomElement($categoryArray))
+                    // ->addLike($faker->numberBetween(10, 1000))
+                    // ->addNotification($faker->randomElement($notificationsArray))
                 ;
                 $manager->persist($note);
             }
+            // Like
+            for ($k = 0; $k < 5; $k++) {
+                $like = new Like();
+                $like
+                    ->setCreator($user)
+                    ->setNote($faker->randomElement($manager->getRepository(Note::class)->findAll()))
+                ;
+                $manager->persist($like);
+            }
+            // 10 Subscriptions
+            for ($m = 0; $m < 5; $m++) {
+                $subscription = new Subscription();
+                $subscription
+                    ->setCreator($user)
+                    ->setOffer($faker->randomElement($manager->getRepository(Offer::class)->findAll()))
+                ;
+                $manager->persist($subscription);
+            }
         }
-
+        //10 Notifications
+        for ($l = 0; $l < 10; $l++) {
+            $notification = new Notification();
+            $notification
+                ->setTitle($faker->sentence())
+                ->setContent($faker->randomHtml())
+                ->setType($faker->sentence())
+                ->isArchived($faker->boolean(50))
+            ;
+            $manager->persist($notification);
+        }
         $manager->flush();
     }
 }
