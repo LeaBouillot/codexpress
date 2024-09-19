@@ -89,6 +89,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->networks = new ArrayCollection();
         $this->subscriptions = new ArrayCollection();
         $this->subscription = new ArrayCollection();
+        
     }
 
     #[ORM\PrePersist]

@@ -77,6 +77,7 @@ class AppFixtures extends Fixture
 
         $networks = ['github', 'twitter', 'linkedin', 'facebook', 'reddit', 'instagram', 'youtube'];
         // 10 utilisateurs
+        $users = [];
         for ($i = 0; $i < 10; $i++) {
             $username = $faker->userName; // Génére un username aléatoire
             $usernameFinal = $this->slug->slug($username); // Username en slug
@@ -88,114 +89,128 @@ class AppFixtures extends Fixture
                 ->setRoles(['ROLE_USER'])
                 ->setImage('https://avatar.iran.liara.run/public/' . $i)
             ;
-            // Network
-            for ($z = 0; $z < 3; $z++) {
-                $network = new Network();
-                $network
-                    ->setName($faker->randomElement($networks))
-                    ->setUrl('hhtps://' . $network->getName() . '.com')
-                    ->setCreator($user)
-                ;
-                $manager->persist($network);
-            }
             $manager->persist($user);
+            $users[] = $user;
+        }
+        // Network
+        for ($z = 0; $z < 3; $z++) {
+            $network = new Network();
+            $network
+                ->setName($faker->randomElement($networks))
+                ->setUrl('hhtps://' . $network->getName() . '.com')
+                ->setCreator($user)
+            ;
+            $manager->persist($network);
+        }
 
-            // 10 Notes
-            for ($j = 0; $j < 10; $j++) {
-                $note = new Note();
-                $note
-                    ->setTitle($faker->sentence())
-                    ->setSlug($this->slug->slug($note->getTitle()))
-                    ->setContent($faker->randomHtml())
-                    ->setPublic($faker->boolean(50))
-                    ->setViews($faker->numberBetween(100, 10000))
-                    ->setCreator($user)
-                    ->setCategory($faker->randomElement($categoryArray))
-                ;
-                $manager->persist($note);
+
+        // 10 Notes
+        $notes = [];
+        for ($j = 0; $j < 10; $j++) {
+            $note = new Note();
+            $note
+                ->setTitle($faker->sentence())
+                ->setSlug($this->slug->slug($note->getTitle()))
+                ->setContent($faker->randomHtml())
+                ->setPublic($faker->boolean(50))
+                ->setViews($faker->numberBetween(100, 10000))
+                ->setCreator($user)
+                ->setCategory($faker->randomElement($categoryArray))
+            ;
+            $manager->persist($note);
+        }
+
+        // Notifications
+        $notificationsArray = [];
+        // Récupère tous les notifications existantes pour les lier aux notes
+        $notifications = $manager->getRepository(Notification::class)->findAll();
+        foreach ($notifications as $notification) {
+            // Ajoute 10 notifications à chaque note
+            for ($o = 0; $o < 10; $o++) {
+                $notification->addNote($faker->randomElement($manager->getRepository(Note::class)->findAll()));
             }
+            array_push($notificationsArray, $notification);
+            $manager->persist($notification);
+        }
 
-            // Notifications
-            $notificationsArray = [];
-            // Récupère tous les notifications existantes pour les lier aux notes
-            $notifications = $manager->getRepository(Notification::class)->findAll();
-            foreach ($notifications as $notification) {
-                // Ajoute 10 notifications à chaque note
-                for ($o = 0; $o < 10; $o++) {
-                    $notification->addNote($faker->randomElement($manager->getRepository(Note::class)->findAll()));
-                }
-                array_push($notificationsArray, $notification);
-                $manager->persist($notification);
-            }
+        // Offers
+        $offers = [];
 
-            // Offers
-            $offers = [];
+        $offer1 = new Offer();
+        $offer1
+            ->setName('Standard')
+            ->setPrice(0.00)
+            ->setFeatures('Basic access to features');
+        $manager->persist($offer1);
+        $offers[] = $offer1;
 
-            $offer1 = new Offer();
-            $offer1
-                ->setName('Standard')
-                ->setPrice(0.00)
-                ->setFeatures('Basic access to features');
-            $manager->persist($offer1);
-            $offers[] = $offer1;
+        $offer2 = new Offer();
+        $offer2
+            ->setName('Premium')
+            ->setPrice(9.99)
+            ->setFeatures('Premium access, additional features included');
+        $manager->persist($offer2);
+        $offers[] = $offer2;
 
-            $offer2 = new Offer();
-            $offer2
-                ->setName('Premium')
-                ->setPrice(9.99)
-                ->setFeatures('Premium access, additional features included');
-            $manager->persist($offer2);
-            $offers[] = $offer2;
+        $offer3 = new Offer();
+        $offer3
+            ->setName('Business')
+            ->setPrice(29.99)
+            ->setFeatures('Full access, priority support, and business features');
+        $manager->persist($offer3);
+        $offers[] = $offer3;
 
-            $offer3 = new Offer();
-            $offer3
-                ->setName('Business')
-                ->setPrice(29.99)
-                ->setFeatures('Full access, priority support, and business features');
-            $manager->persist($offer3);
-            $offers[] = $offer3;
+        // Subscriptions
+        if (!empty($users)) {
 
-            // Subscriptions
             for ($i = 0; $i < 5; $i++) {
                 $subscription = new Subscription();
+
+                // Choisir un utilisateur aléatoire si le tableau n'est pas vide
+                $randomUser = $users[array_rand($users)];
+
                 $subscription
-                    ->setOffer($offers[array_rand($offers)])
-                    ->setCreator($user)
-                    ->setStartDate($faker->dateTime)
+                    ->setOffer($offers[array_rand($offers)]) // Associe une offre aléatoire
+                    ->setCreator($randomUser) // Associe un utilisateur
+                    ->setStartDate($faker->dateTime())
                     ->setEndDate($faker->dateTimeImmutableBetween('+1 month', '+2 years'));
 
                 $manager->persist($subscription);
             }
+        } else {
+            throw new \Exception('Le tableau $users est vide. Assurez-vous que les utilisateurs sont bien créés avant de les utiliser.');
+        }
 
-            $manager->flush();
-
-            //Like 
+        // Like
+        $users = [];
+        foreach ($notes as $note) {
             for ($k = 0; $k < 30; $k++) {
                 $like = new Like();
 
-                // Choisir un utilisateur aléatoire et une note aléatoire
-                $randomUser = $user[array_rand($user)];
-                $randomNote = $note[array_rand($note)]; // $notes contient toutes les entités Note persistées
+                // Choisir un utilisateur aléatoire pour chaque like
+                $randomUser = $users[array_rand($users)]; // Associe un utilisateur aléatoire
 
-                $like->setCreator($randomUser) // Associe l'utilisateur à ce like
-                    ->setNote($randomNote); // Associe la note à ce like
+                $like
+                    ->setCreator($randomUser) // Associe un utilisateur aléatoire à ce like
+                    ->setNote($note); // Associe la note à ce like
 
                 $manager->persist($like);
             }
-
-            // View
-            for ($l = 0; $l < 1000; $l++) {
-                $view = new View();
-
-                // Choisir une note aléatoire pour la vue
-                $randomNote = $note[array_rand($note)];
-
-                $view->setNote($randomNote) // Associe la vue à une note
-                    ->setIpAddress($faker->ipv4); // Génère une adresse IP aléatoire
-
-                $manager->persist($view);
-            }
-            $manager->flush();
         }
+
+
+        // View
+        for ($l = 0; $l < 1000; $l++) {
+            $view = new View();
+
+            // Choisir une note aléatoire pour la vue
+            $randomNote = $note[array_rand($note)];
+
+            $view->setNote($randomNote) // Associe la vue à une note
+                ->setIpAddress($faker->ipv4); // Génère une adresse IP aléatoire
+
+            $manager->persist($view);
+        }
+        $manager->flush();
     }
 }
