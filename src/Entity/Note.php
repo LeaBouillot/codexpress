@@ -58,6 +58,12 @@ class Note
     #[ORM\OneToMany(targetEntity: Like::class, mappedBy: 'note', orphanRemoval: true)]
     private Collection $likes;
 
+    /**
+     * @var Collection<int, View>
+     */
+    #[ORM\OneToMany(targetEntity: View::class, mappedBy: 'note')]
+    private Collection $view;
+
 
     public function __construct()
     {
@@ -65,6 +71,7 @@ class Note
         $this->is_public = false; // Initialisation du booléan à false
         $this->title = uniqid('note_'); // Initialisation du titre au GUID
         $this->views = 0; // initialisation du compteur de vues
+        $this->view = new ArrayCollection();
     }
 
     #[ORM\PrePersist]
@@ -247,6 +254,36 @@ class Note
             // set the owning side to null (unless already changed)
             if ($like->getNote() === $this) {
                 $like->setNote(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, View>
+     */
+    public function getView(): Collection
+    {
+        return $this->view;
+    }
+
+    public function addView(View $view): static
+    {
+        if (!$this->view->contains($view)) {
+            $this->view->add($view);
+            $view->setNote($this);
+        }
+
+        return $this;
+    }
+
+    public function removeView(View $view): static
+    {
+        if ($this->view->removeElement($view)) {
+            // set the owning side to null (unless already changed)
+            if ($view->getNote() === $this) {
+                $view->setNote(null);
             }
         }
 
