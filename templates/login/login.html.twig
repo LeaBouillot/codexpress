@@ -1,46 +1,64 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Log in!
-{% endblock %}
+{% block title %}Log in{% endblock %}
 
 {% block body %}
-	<form method="post">
-		{% if error %}
-			<div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-		{% endif %}
+    <main class="flex flex-col items-center justify-center py-5 h-max bg-gradient-to-r from-violet-100 via-slate-100 to-indigo-100 md:py-16">
+        {% if error %}
+            <div class="relative px-4 py-3 mb-4 text-red-700 bg-red-100 border border-red-400 rounded" role="alert">
+                <span class="block sm:inline">{{ error.messageKey|trans(error.messageData, 'security') }}</span>
+            </div>
+        {% endif %}
 
-		{% if app.user %}
-			<div class="mb-3">
-				You are logged in as
-				{{ app.user.userIdentifier }}
-			</div>
-			<button class="bg-orange-500" >
-				<a href="{{ path('app_logout') }}">Logout</a>
-			</button>
+        {% if app.user %}
+            <div class="relative px-4 py-3 mb-4 text-green-700 bg-green-100 border border-green-400 rounded" role="alert">
+                You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}" class="font-bold">Logout</a>
+            </div>
+        {% endif %}
 
-		{% endif %}
+        <header class="mb-4 text-center">
+            <h1 class="mb-4 text-4xl font-bold md:text-5xl">Welcome back</h1>
+            <p class="mb-4 text-slate-600">
+                Sign in to access your notes and continue coding.
+            </p>
+        </header>
 
-		<h1 class="mb-3 h3 font-weight-normal">Please sign in</h1>
-		<label for="username">Email</label>
-		<input type="email" value="{{ last_username }}" name="_username" id="username" class="form-control" autocomplete="email" required autofocus>
-		<label for="password">Password</label>
-		<input type="password" name="_password" id="password" class="form-control" autocomplete="current-password" required>
+        <div class="p-4 my-10 rounded-md shadow-md bg-slate-50 min-w-80">
+            <form method="post" action="{{ path('app_login') }}">
+                <div class="mb-4">
+                    <label for="username" class="block mb-2 font-medium text-gray-700">
+                        Email address
+                    </label>
+                    <input type="email" value="{{ last_username }}" name="_username" id="username" class="w-full p-2 border-2 rounded-md border-violet-950 focus:border-violet-600" autocomplete="email" required autofocus>
+                </div>
 
-		<input
-		type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                <div class="mb-4">
+                    <label for="password" class="block mb-2 font-medium text-gray-700">
+                        Type your password
+                    </label>
+                    <input type="password" name="_password" id="password" class="w-full p-2 border-2 rounded-md border-violet-950 focus:border-violet-600" autocomplete="current-password" required>
+                </div>
 
-		{#
-		            Uncomment this section and add a remember_me option below your firewall to activate remember me functionality.
-		            See https://symfony.com/doc/current/security/remember_me.html
-		
-		            <div class="mb-3 checkbox">
-		                <input type="checkbox" name="_remember_me" id="_remember_me">
-		                <label for="_remember_me">Remember me</label>
-		            </div>
-		        #}
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 
-		<button class="btn btn-lg btn-primary" type="submit">
-			Sign in
-		</button>
-	</form>
+                <div class="flex flex-col items-center justify-between gap-2 mb-4">
+                    <div class="flex items-center">
+                        <input type="checkbox" name="_remember_me" id="_remember_me" class="w-4 h-4 border-gray-300 rounded text-violet-600 focus:ring-violet-500">
+                        <label for="_remember_me" class="block ml-2 text-sm text-gray-900">Remember me</label>
+                    </div>
+                    <div class="text-sm">
+                        <a href="#" class="font-medium text-violet-600 hover:text-violet-500">Forgot your password?</a>
+                    </div>
+                </div>
+
+                <button type="submit" class="flex items-center justify-center w-full gap-2 p-2 mt-4 text-white rounded-md bg-violet-600 hover:bg-violet-700">
+                    {{ ux_icon('mdi:login', { 'class': 'h-6 w-6' }) }}
+                    Sign in
+                </button>
+            </form>
+        </div>
+        <p class="pb-48 mb-4 text-sm text-center text-slate-600">Don't have an account?
+            <a href="{{ path('app_register') }}" class="text-violet-600 hover:text-violet-800">Register now</a>
+        </p>
+    </main>
 {% endblock %}
