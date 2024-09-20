@@ -6,15 +6,13 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-#[ORM\HasLifecycleCallbacks]
 #[ORM\Table(name: '`user`')]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
-#[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
+#[ORM\HasLifecycleCallbacks]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -43,7 +41,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var Collection<int, Note>
      */
-    #[ORM\OneToMany(targetEntity: Note::class, mappedBy: 'creator')]
+    #[ORM\OneToMany(targetEntity: Note::class, mappedBy: 'creator', orphanRemoval: true)]
     private Collection $notes;
 
     #[ORM\Column]
@@ -64,23 +62,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Network::class, mappedBy: 'creator', orphanRemoval: true)]
     private Collection $networks;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $image = null;
-
-    #[ORM\Column]
-    private bool $isVerified = false;
-
     /**
      * @var Collection<int, Subscription>
      */
     #[ORM\OneToMany(targetEntity: Subscription::class, mappedBy: 'creator')]
     private Collection $subscriptions;
 
-    /**
-     * @var Collection<int, Subscription>
-     */
-    #[ORM\OneToMany(targetEntity: Subscription::class, mappedBy: 'creator')]
-    private Collection $subscription;
+    #[ORM\Column(length: 255)]
+    private ?string $image = null;
 
     public function __construct()
     {
@@ -88,8 +77,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->likes = new ArrayCollection();
         $this->networks = new ArrayCollection();
         $this->subscriptions = new ArrayCollection();
-        $this->subscription = new ArrayCollection();
-        
+        $this->image = 'default.png';
     }
 
     #[ORM\PrePersist]
@@ -104,6 +92,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->updated_at = new \DateTimeImmutable();
     }
+
 
     public function getId(): ?int
     {
@@ -306,30 +295,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getImage(): ?string
-    {
-        return $this->image;
-    }
-
-    public function setImage(?string $image): static
-    {
-        $this->image = $image;
-
-        return $this;
-    }
-
-    public function isVerified(): bool
-    {
-        return $this->isVerified;
-    }
-
-    public function setVerified(bool $isVerified): static
-    {
-        $this->isVerified = $isVerified;
-
-        return $this;
-    }
-
     /**
      * @return Collection<int, Subscription>
      */
@@ -360,11 +325,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * @return Collection<int, Subscription>
-     */
-    public function getSubscription(): Collection
+    public function getImage(): ?string
     {
-        return $this->subscription;
+        return $this->image;
+    }
+
+    public function setImage(string $image): static
+    {
+        $this->image = $image;
+
+        return $this;
+    }
+
+    public function __toString(): string
+    {
+        return $this->username;
     }
 }

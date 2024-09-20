@@ -64,6 +64,9 @@ class Note
     #[ORM\OneToMany(targetEntity: View::class, mappedBy: 'note')]
     private Collection $view;
 
+    #[ORM\Column]
+    private ?bool $is_premium = null;
+
 
     public function __construct()
     {
@@ -286,6 +289,18 @@ class Note
                 $view->setNote(null);
             }
         }
+
+        return $this;
+    }
+
+    public function isPremium(): ?bool
+    {
+        return $this->is_premium;
+    }
+
+    public function setPremium(bool $is_premium): static
+    {
+        $this->is_premium = $is_premium;
 
         return $this;
     }
