@@ -28,6 +28,7 @@ class Notification
     private ?bool $archived = null;
 
     #[ORM\ManyToOne(inversedBy: 'notifications')]
+    #[ORM\JoinColumn(nullable: false)]
     private ?Note $note = null;
 
     #[ORM\Column]
@@ -36,11 +37,6 @@ class Notification
     #[ORM\Column]
     private ?\DateTimeImmutable $updated_at = null;
 
-    public function __construct()
-    {
-        $this->type = 'info';
-        $this->archived = false; //les notif ne sont 
-    }
     #[ORM\PrePersist]
     public function setCreatedAtValue(): void
     {
@@ -53,6 +49,13 @@ class Notification
     {
         $this->updated_at = new \DateTimeImmutable();
     }
+
+    public function __construct()
+    {
+        $this->type = 'info'; // type de notif par défaut est "info"
+        $this->archived = false; // les notifs ne sont pas archivés par défaut
+    }
+
     public function getId(): ?int
     {
         return $this->id;

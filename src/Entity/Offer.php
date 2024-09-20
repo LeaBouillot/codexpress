@@ -16,10 +16,10 @@ class Offer
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 120)]
     private ?string $name = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 0)]
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
     private ?string $price = null;
 
     #[ORM\Column(type: Types::TEXT)]
@@ -33,6 +33,16 @@ class Offer
 
     public function __construct()
     {
+        $this->name = 'Premium';
+        $this->price = '4.90';
+        $this->features = "
+            <ul>
+                <li>Access to all premium notes</li>
+                <li>AI Convert4You</li>
+                <li>Monetization of your notes</li>
+                <li>Monthly Good Deals</li>
+            </ul>
+        ";
         $this->subscriptions = new ArrayCollection();
     }
 

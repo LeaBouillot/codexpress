@@ -6,6 +6,7 @@ use App\Repository\ViewRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ViewRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class View
 {
     #[ORM\Id]
@@ -13,9 +14,9 @@ class View
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'view')]
+    #[ORM\ManyToOne(inversedBy: 'views')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?note $note = null;
+    private ?Note $note = null;
 
     #[ORM\Column(length: 255)]
     private ?string $ip_address = null;
@@ -23,20 +24,33 @@ class View
     #[ORM\Column]
     private ?\DateTimeImmutable $created_at = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column]
     private ?\DateTimeImmutable $updated_at = null;
 
+    #[ORM\PrePersist]
+    public function setCreatedAtValue(): void
+    {
+        $this->created_at = new \DateTimeImmutable();
+        $this->setUpdatedAtValue();
+    }
+
+    #[ORM\PreUpdate]
+    public function setUpdatedAtValue(): void
+    {
+        $this->updated_at = new \DateTimeImmutable();
+    }
+    
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getNote(): ?note
+    public function getNote(): ?Note
     {
         return $this->note;
     }
 
-    public function setNote(?note $note): static
+    public function setNote(?Note $note): static
     {
         $this->note = $note;
 
@@ -72,7 +86,7 @@ class View
         return $this->updated_at;
     }
 
-    public function setUpdatedAt(?\DateTimeImmutable $updated_at): static
+    public function setUpdatedAt(\DateTimeImmutable $updated_at): static
     {
         $this->updated_at = $updated_at;
 

@@ -29,9 +29,6 @@ class Note
     #[ORM\Column]
     private ?bool $is_public = null;
 
-    #[ORM\Column(type: Types::BIGINT)]
-    private ?string $views = null;
-
     #[ORM\Column]
     private ?\DateTimeImmutable $created_at = null;
 
@@ -61,24 +58,24 @@ class Note
     /**
      * @var Collection<int, View>
      */
-    #[ORM\OneToMany(targetEntity: View::class, mappedBy: 'note')]
-    private Collection $view;
+    #[ORM\OneToMany(targetEntity: View::class, mappedBy: 'note', orphanRemoval: true)]
+    private Collection $views;
 
     #[ORM\Column]
     private ?bool $is_premium = null;
 
-
     public function __construct()
     {
-        $this->notifications = new ArrayCollection();
-        $this->is_public = false; // Initialisation du booléan à false
-        $this->title = uniqid('note_'); // Initialisation du titre au GUID
-        $this->views = 0; // initialisation du compteur de vues
-        $this->view = new ArrayCollection();
+        $this->notifications = new ArrayCollection(); // initialisation du tableau de notifications
+        $this->is_public = false; // initialisation du booléen à false
+        $this->is_premium = false; // initialisation du booléen à false
+        $this->title = uniqid('note-'); // initialisation du titre au GUID
+        $this->likes = new ArrayCollection();
+        $this->views = new ArrayCollection();
     }
 
     #[ORM\PrePersist]
-    public function sValue(): void
+    public function setCreatedAtValue(): void
     {
         $this->created_at = new \DateTimeImmutable();
         $this->setUpdatedAtValue();
@@ -139,18 +136,6 @@ class Note
     public function setPublic(bool $is_public): static
     {
         $this->is_public = $is_public;
-
-        return $this;
-    }
-
-    public function getViews(): ?string
-    {
-        return $this->views;
-    }
-
-    public function setViews(string $views): static
-    {
-        $this->views = $views;
 
         return $this;
     }
@@ -266,27 +251,27 @@ class Note
     /**
      * @return Collection<int, View>
      */
-    public function getView(): Collection
+    public function getViews(): Collection
     {
-        return $this->view;
+        return $this->views;
     }
 
-    public function addView(View $view): static
+    public function addViews(View $views): static
     {
-        if (!$this->view->contains($view)) {
-            $this->view->add($view);
-            $view->setNote($this);
+        if (!$this->views->contains($views)) {
+            $this->views->add($views);
+            $views->setNote($this);
         }
 
         return $this;
     }
 
-    public function removeView(View $view): static
+    public function removeViews(View $views): static
     {
-        if ($this->view->removeElement($view)) {
+        if ($this->views->removeElement($views)) {
             // set the owning side to null (unless already changed)
-            if ($view->getNote() === $this) {
-                $view->setNote(null);
+            if ($views->getNote() === $this) {
+                $views->setNote(null);
             }
         }
 

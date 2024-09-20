@@ -16,35 +16,35 @@ class Like
 
     #[ORM\ManyToOne(inversedBy: 'likes')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?note $note = null;
+    private ?Note $note = null;
 
     #[ORM\ManyToOne(inversedBy: 'likes')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?user $creator = null;
+    private ?User $creator = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getNote(): ?note
+    public function getNote(): ?Note
     {
         return $this->note;
     }
 
-    public function setNote(?note $note): static
+    public function setNote(?Note $note): static
     {
         $this->note = $note;
 
         return $this;
     }
 
-    public function getCreator(): ?user
+    public function getCreator(): ?User
     {
         return $this->creator;
     }
 
-    public function setCreator(?user $creator): static
+    public function setCreator(?User $creator): static
     {
         $this->creator = $creator;
 
