@@ -12,7 +12,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-#[IsGranted('IS_AUTHENTICATED_FULLY')]
+#[IsGranted('IS_AUTHENTICATED_FULLY')] // obliger de connecter pr liker sinon rejeter, obliger de creer un compte
 class LikeController extends AbstractController
 {
     #[Route('/like', name: 'app_like', methods: ['POST'])]
@@ -30,10 +30,11 @@ class LikeController extends AbstractController
             $em->persist($newLike);
             $em->flush();
         } elseif ($like->getCreator() === $this->getUser()) {
-            $em->remove($like);
+            $em->remove($like); 
             $em->flush();
         }
 
         return $referer ? $this->redirect($referer) : $this->redirectToRoute('app_note_all');
+        // si on arrive pas a la page precedente, retourner sur la page d'accueil
     }
 }

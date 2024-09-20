@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Note;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Mapping\Cache;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -11,7 +12,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class NoteRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    private $cache;
+    public function __construct(ManagerRegistry $registry, Cache $cache)
     {
         parent::__construct($registry, Note::class);
     }
