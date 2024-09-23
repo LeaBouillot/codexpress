@@ -70,6 +70,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255)]
     private ?string $image = null;
+    
+    #[ORM\Column]
+    private ?bool $isVerified = null;
 
     public function __construct()
     {
@@ -78,6 +81,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->networks = new ArrayCollection();
         $this->subscriptions = new ArrayCollection();
         $this->image = 'default.png';
+        $this->isVerified = false;
     }
 
     #[ORM\PrePersist]
@@ -337,6 +341,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function isVerified(): ?bool
+    {
+        return $this->isVerified;
+    }
+
+    public function setVerified(bool $isVerified): static
+    {
+        $this->isVerified = $isVerified;
+
+        return $this;
+    }
+
+    /**
+     * Lorsqu'une valeur ne peut pas être convertie en 
+     * une chaîne de caractères, utlisez cette méthode
+     **/ 
     public function __toString(): string
     {
         return $this->username;

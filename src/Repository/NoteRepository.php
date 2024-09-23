@@ -4,7 +4,6 @@ namespace App\Repository;
 
 use App\Entity\Note;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\ORM\Mapping\Cache;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -12,8 +11,7 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class NoteRepository extends ServiceEntityRepository
 {
-    private $cache;
-    public function __construct(ManagerRegistry $registry, Cache $cache)
+    public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Note::class);
     }
@@ -24,26 +22,26 @@ class NoteRepository extends ServiceEntityRepository
      * @param string $query
      * @return array
      */
-    public function findByQuery($query): array //Search
+    public function findByQuery($query): array
     {
-        return $this->createQueryBuilder('n') //method (nomer premiere lettre n)
-            ->where('n.is_public = true') // 
-            ->andWhere('n.title LIKE :q OR n.content LIKE :q') //
+        return $this->createQueryBuilder('n')
+            ->where('n.is_public = true')
+            ->andWhere('n.title LIKE :q OR n.content LIKE :q')
             ->setParameter('q', '%' . $query . '%')
             ->orderBy('n.created_at', 'DESC')
-            ->getQuery() // form associative array
+            ->getQuery()
             ->getResult()
         ;
     }
 
-    public function findByCreator($id): array //modofier à NoteController 45/
+    public function findByCreator($id): array
     {
         return $this->createQueryBuilder('n')
             ->where('n.is_public = true')
-            ->andWhere('n.creator = :id') //dans le bdd champ name
+            ->andWhere('n.creator = :id')
             ->setParameter('id', $id)
             ->orderBy('n.created_at', 'DESC')
-            ->setMaxResults(3) //limitation à 3 resultat
+            ->setMaxResults(3)
             ->getQuery()
             ->getResult()
         ;
