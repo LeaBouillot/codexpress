@@ -70,7 +70,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255)]
     private ?string $image = null;
-    
+
     #[ORM\Column]
     private ?bool $isVerified = null;
 
@@ -356,7 +356,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Lorsqu'une valeur ne peut pas être convertie en 
      * une chaîne de caractères, utlisez cette méthode
-     **/ 
+     **/
     public function __toString(): string
     {
         return $this->username;

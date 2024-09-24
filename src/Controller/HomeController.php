@@ -30,4 +30,10 @@ class HomeController extends AbstractController
         $ems->sendEmail($this->getUser()->getEmail());
         return new Response('Email sent to ' . $this->getUser()->getEmail());
     }
+    #[Route('/network', name: 'app_network')]
+    public function network(): Response
+    {
+        
+        return new Response('Email sent to ' . $this->getUser());
+    }
 }
