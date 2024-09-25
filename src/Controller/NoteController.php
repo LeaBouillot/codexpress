@@ -28,26 +28,29 @@ class NoteController extends AbstractController
             10
         );
 
-        return $this->render('note/all.html.twig', ['allNotes' => $pagination,]);
+        return $this->render('note/all.html.twig', [
+            'allNotes' => $pagination,
+        ]);
     }
 
     #[Route('/n/{slug}', name: 'app_note_show', methods: ['GET'])]
     public function show(string $slug, NoteRepository $nr, Request $request, EntityManagerInterface $em): Response
     {
-        // dd($request);
         $note = $nr->findOneBySlug($slug);
 
         if (!$note) {
             throw $this->createNotFoundException('Note not found');
         }
-        //------
+
+        //---------- Ça finira dans un NoteViewService.php
         $view = new View();
         $view
-            ->setNote($note)
-            ->setIpAddress($request->getClientIp());
+        ->setNote($note)
+        ->setIpAddress($request->getClientIp());
         $em->persist($view);
         $em->flush();
-        // ------ 
+        //---------- Ça finira dans un NoteViewService.php
+
         return $this->render('note/show.html.twig', [
             'note' => $note,
             'creatorNotes' => $nr->findByCreator($note->getCreator()->getId()),
@@ -77,20 +80,13 @@ class NoteController extends AbstractController
             return $this->redirectToRoute('app_login');
         }
 
-        $form = $this->createForm(NoteType::class); // Chargement du formulaire
+        $note = new Note();
+        $form = $this->createForm(NoteType::class, $note); // Chargement du formulaire
         $form = $form->handleRequest($request); // Recuperation des données de la requête POST
 
         // Traitement des données
         if ($form->isSubmitted() && $form->isValid()) {
-            $note = new Note();
-            $note
-                ->setTitle($form->get('title')->getData())
-                ->setSlug($slugger->slug($note->getTitle()))
-                ->setContent($form->get('content')->getData())
-                ->setPublic($form->get('is_public')->getData())
-                ->setCategory($form->get('category')->getData())
-                ->setCreator($form->get('creator')->getData())
-            ;
+            $note->setSlug($slugger->slug($note->getTitle()));
             $em->persist($note);
             $em->flush();
 
@@ -104,7 +100,7 @@ class NoteController extends AbstractController
 
     #[IsGranted('IS_AUTHENTICATED_FULLY')]
     #[Route('/edit/{slug}', name: 'app_note_edit', methods: ['GET', 'POST'])]
-    public function edit(string $slug, NoteRepository $nr, Request $request, EntityManagerInterface $em): Response
+    public function edit(string $slug, NoteRepository $nr, Request $request, EntityManagerInterface $em): Response 
     {
         $note = $nr->findOneBySlug($slug);
 
