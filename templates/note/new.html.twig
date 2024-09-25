@@ -7,9 +7,9 @@
 {% block body %}
 {% if app.user %}
     {# {{ include('components/access-denied.html.twig') }} #}
-    {% if app.user.email|length > 18 %}
+    {# {% if app.user.email|length > 18 %} #}
         {{ form(noteForm) }}
-    {% endif %}
+    {# {% endif %} #}
 {% else %}
     {# {{ include('components/access-denied.html.twig') }} #}
     <!-- JE SUIS LÀ -->
