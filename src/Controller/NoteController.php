@@ -97,7 +97,7 @@ class NoteController extends AbstractController
             'noteForm' => $form
         ]);
     }
-
+// COnt)rainte//
     #[IsGranted('IS_AUTHENTICATED_FULLY')]
     #[Route('/edit/{slug}', name: 'app_note_edit', methods: ['GET', 'POST'])]
     public function edit(string $slug, NoteRepository $nr, Request $request, EntityManagerInterface $em): Response 

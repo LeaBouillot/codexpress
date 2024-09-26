@@ -23,7 +23,7 @@ class CreatorType extends AbstractType
                 'constraints' => [
                     new File([
                         'maxSize' => '1024k',
-                        'mimeTypes' => ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
+                        'mimeTypes' => ['image/jpg', 'image/jpeg', 'image/png', 'image/gif', 'image/webp'],
                         'mimeTypesMessage' => 'Please upload a valid image file',
                     ])
                 ],

@@ -13,7 +13,7 @@ security:
     role_hierarchy:
         # ROLE_SUPERADMIN: ['ROLE_ADMIN'] # Ce rôle est plus fort que ADMIN
         ROLE_ADMIN: ['ROLE_PREMIUM'] # Ce rôle est plus fort que PREMIUM
-        ROLE_PREMIUM: ['ROLE_USER']   # Ce rôle est plus fort que USER
+        ROLE_PREMIUM: ['ROLE_USER'] # Ce rôle est plus fort que USER
 
     firewalls:
         dev:
@@ -29,7 +29,7 @@ security:
             logout:
                 path: app_logout
                 # where to redirect after logout
-                # target: app_any_route
+                target: app_home
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
@@ -40,12 +40,9 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        # - { path: ^/login, roles: PUBLIC_ACCESS }
-        # - { path: ^/register, roles: RPUBLIC_ACCESS }
-        # - { path: ^/, roles: ROLE_ADMIN }
-        # - { path: ^/notes/new, roles: ROLE_USER }
-        - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/en/admin, roles: ROLE_ADMIN }
+        # - { path: ^/profile, roles: ROLE_ADMIN }
+        # - { path: ^/admin, roles: ROLE_ADMIN }
 
 when@test:
     security:
