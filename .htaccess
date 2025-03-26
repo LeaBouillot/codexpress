@@ -1,0 +1,5 @@
+# Redirect all traffic to the public directory
+RewriteEngine On
+RewriteRule ^(.*)$ /public/$1 [L]
+php_value display_errors 1
+php_value display_startup_errors 1
